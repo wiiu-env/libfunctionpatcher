@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 extern void FunctionPatcherPatchFunction(function_replacement_data_t *replacements, uint32_t size);
-
+extern void FunctionPatcherRestoreFunctions(function_replacement_data_t *replacements, uint32_t size);
 #ifdef __cplusplus
 }
 #endif
