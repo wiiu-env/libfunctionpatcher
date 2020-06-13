@@ -75,8 +75,10 @@ typedef enum function_replacement_library_type_t {
 #define MAXIMUM_FUNCTION_NAME_LENGTH                        100
 #define FUNCTION_PATCHER_METHOD_STORE_SIZE                  40
 
-#define STATIC_FUNCTION         0
-#define DYNAMIC_FUNCTION        1
+typedef enum FunctionPatcherFunctionType {
+    FUNCTION_PATCHER_STATIC_FUNCTION       = 0,
+    FUNCTION_PATCHER_DYNAMIC_FUNCTION      = 1
+} FunctionPatcherFunctionType;
 
 typedef struct function_replacement_data_t {
     uint32_t                            physicalAddr;                                       /* [needs to be filled]  */
@@ -88,7 +90,7 @@ typedef struct function_replacement_data_t {
     uint32_t                            realAddr;                                           /* [will be filled] Address of the real function we want to replace. */
     volatile uint32_t                   replace_data [FUNCTION_PATCHER_METHOD_STORE_SIZE];  /* [will be filled] Space for us to store some jump instructions */
     uint32_t                            restoreInstruction;                                 /* [will be filled] Copy of the instruction we replaced to jump to our code. */
-    uint8_t                             functionType;                                       /* [will be filled] */
+    FunctionPatcherFunctionType         functionType;                                       /* [will be filled] */
     uint8_t                             alreadyPatched;                                     /* [will be filled] */
 } function_replacement_data_t;
 
@@ -103,7 +105,7 @@ typedef struct function_replacement_data_t {
         0, \
         {}, \
         0, \
-        STATIC_FUNCTION, \
+        FUNCTION_PATCHER_STATIC_FUNCTION, \
         0 \
     }
 
@@ -118,7 +120,7 @@ typedef struct function_replacement_data_t {
         0, \
         {}, \
         0, \
-        STATIC_FUNCTION, \
+        FUNCTION_PATCHER_STATIC_FUNCTION, \
         0 \
     }
 
