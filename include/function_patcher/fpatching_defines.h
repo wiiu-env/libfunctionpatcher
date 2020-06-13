@@ -80,7 +80,10 @@ typedef enum FunctionPatcherFunctionType {
     FUNCTION_PATCHER_DYNAMIC_FUNCTION      = 1
 } FunctionPatcherFunctionType;
 
+#define FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION            0x00000001
+
 typedef struct function_replacement_data_t {
+    uint32_t                            VERSION;
     uint32_t                            physicalAddr;                                       /* [needs to be filled]  */
     uint32_t                            virtualAddr;                                        /* [needs to be filled]  */
     uint32_t                            replaceAddr;                                        /* [needs to be filled] Address of our replacement function */
@@ -103,6 +106,7 @@ typedef struct function_replacement_data_t {
 
 #define REPLACE_FUNCTION_EX(x, lib, function_name, physicalAddress, effectiveAddress) \
     { \
+        FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION, \
         physicalAddress, \
         effectiveAddress, \
         (uint32_t) my_ ## x, \
