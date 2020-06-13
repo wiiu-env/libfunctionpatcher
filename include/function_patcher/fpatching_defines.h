@@ -123,13 +123,13 @@ typedef struct function_replacement_data_t {
         REPLACE_FUNCTION_FOR_PROCESS(x, lib, function_name, FP_TARGET_PROCESS_GAME_AND_MENU)
 
 #define REPLACE_FUNCTION_FOR_PROCESS(x, lib, function_name, process) \
-        REPLACE_FUNCTION_EX(x, lib, function_name, 0, 0, process)
+        REPLACE_FUNCTION_EX(x, lib, # function_name, 0, 0, process)
 
 #define REPLACE_FUNCTION_VIA_ADDRESS(x, physicalAddress, effectiveAddress) \
         REPLACE_FUNCTION_VIA_ADDRESS_FOR_PROCESS(x, physicalAddress, effectiveAddress, FP_TARGET_PROCESS_ALL)
 
 #define REPLACE_FUNCTION_VIA_ADDRESS_FOR_PROCESS(x, physicalAddress, effectiveAddress, process) \
-        REPLACE_FUNCTION_EX(x, LIBRARY_OTHER, x, physicalAddress, effectiveAddress, process)
+        REPLACE_FUNCTION_EX(x, LIBRARY_OTHER, # x, physicalAddress, effectiveAddress, process)
 
 #define REPLACE_FUNCTION_EX(x, lib, function_name, physicalAddress, effectiveAddress, process) \
     { \
