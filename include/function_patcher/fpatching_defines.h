@@ -94,34 +94,26 @@ typedef struct function_replacement_data_t {
     uint8_t                             alreadyPatched;                                     /* [will be filled] */
 } function_replacement_data_t;
 
+
 #define REPLACE_FUNCTION(x, lib, function_name) \
-    { \
-        0, \
-        0, \
-        (uint32_t) my_ ## x, \
-        (uint32_t) &real_ ## x, \
-        lib, \
-        # function_name, \
-        0, \
-        {}, \
-        0, \
-        FUNCTION_PATCHER_STATIC_FUNCTION, \
-        0 \
-    }
+        REPLACE_FUNCTION_EX(x, lib, function_name, 0, 0)
 
 #define REPLACE_FUNCTION_VIA_ADDRESS(x, physicalAddress, effectiveAddress) \
+         REPLACE_FUNCTION_EX(x, LIBRARY_OTHER, x, physicalAddress, effectiveAddress)
+
+#define REPLACE_FUNCTION_EX(x, lib, function_name, physicalAddress, effectiveAddress) \
     { \
         physicalAddress, \
         effectiveAddress, \
         (uint32_t) my_ ## x, \
         (uint32_t) &real_ ## x, \
-        LIBRARY_OTHER, \
-        # x, \
+        lib, \
+        function_name, \
         0, \
         {}, \
         0, \
         FUNCTION_PATCHER_STATIC_FUNCTION, \
-        0 \
+        0, \
     }
 
 #define DECL_FUNCTION(res, name, ...) \
