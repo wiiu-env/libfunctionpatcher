@@ -73,7 +73,7 @@ typedef enum function_replacement_library_type_t {
 } function_replacement_library_type_t;
 
 #define MAXIMUM_FUNCTION_NAME_LENGTH                        100
-#define FUNCTION_PATCHER_METHOD_STORE_SIZE                  20
+#define FUNCTION_PATCHER_METHOD_STORE_SIZE                  40
 
 #define STATIC_FUNCTION         0
 #define DYNAMIC_FUNCTION        1
