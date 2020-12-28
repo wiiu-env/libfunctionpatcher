@@ -3,3 +3,4 @@
 :TEXT
 FunctionPatcherPatchFunction
 FunctionPatcherRestoreFunctions
+FunctionPatcherRestoreDynamicFunctions
