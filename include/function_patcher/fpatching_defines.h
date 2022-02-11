@@ -72,82 +72,82 @@ typedef enum function_replacement_library_type_t {
     LIBRARY_OTHER,
 } function_replacement_library_type_t;
 
-#define MAXIMUM_FUNCTION_NAME_LENGTH                        100
-#define FUNCTION_PATCHER_METHOD_STORE_SIZE                  40
+#define MAXIMUM_FUNCTION_NAME_LENGTH       100
+#define FUNCTION_PATCHER_METHOD_STORE_SIZE 40
 
 typedef enum FunctionPatcherFunctionType {
-    FUNCTION_PATCHER_STATIC_FUNCTION       = 0,
-    FUNCTION_PATCHER_DYNAMIC_FUNCTION      = 1
+    FUNCTION_PATCHER_STATIC_FUNCTION  = 0,
+    FUNCTION_PATCHER_DYNAMIC_FUNCTION = 1
 } FunctionPatcherFunctionType;
 
 typedef enum FunctionPatcherTargetProcess {
-    FP_TARGET_PROCESS_ALL                   = 0xFF,
-    FP_TARGET_PROCESS_ROOT_RPX              = 1,
-    FP_TARGET_PROCESS_WII_U_MENU            = 2,
-    FP_TARGET_PROCESS_TVII                  = 3,
-    FP_TARGET_PROCESS_E_MANUAL              = 4,
-    FP_TARGET_PROCESS_HOME_MENU             = 5,
-    FP_TARGET_PROCESS_ERROR_DISPLAY         = 6,
-    FP_TARGET_PROCESS_MINI_MIIVERSE         = 7,
-    FP_TARGET_PROCESS_BROWSER               = 8,
-    FP_TARGET_PROCESS_MIIVERSE              = 9,
-    FP_TARGET_PROCESS_ESHOP                 = 10,
-    FP_TARGET_PROCESS_PFID_11               = 11,
-    FP_TARGET_PROCESS_DOWNLOAD_MANAGER      = 12,
-    FP_TARGET_PROCESS_PFID_13               = 13,
-    FP_TARGET_PROCESS_PFID_14               = 14,
-    FP_TARGET_PROCESS_GAME                  = 15,
-    FP_TARGET_PROCESS_GAME_AND_MENU         = 16,
+    FP_TARGET_PROCESS_ALL              = 0xFF,
+    FP_TARGET_PROCESS_ROOT_RPX         = 1,
+    FP_TARGET_PROCESS_WII_U_MENU       = 2,
+    FP_TARGET_PROCESS_TVII             = 3,
+    FP_TARGET_PROCESS_E_MANUAL         = 4,
+    FP_TARGET_PROCESS_HOME_MENU        = 5,
+    FP_TARGET_PROCESS_ERROR_DISPLAY    = 6,
+    FP_TARGET_PROCESS_MINI_MIIVERSE    = 7,
+    FP_TARGET_PROCESS_BROWSER          = 8,
+    FP_TARGET_PROCESS_MIIVERSE         = 9,
+    FP_TARGET_PROCESS_ESHOP            = 10,
+    FP_TARGET_PROCESS_PFID_11          = 11,
+    FP_TARGET_PROCESS_DOWNLOAD_MANAGER = 12,
+    FP_TARGET_PROCESS_PFID_13          = 13,
+    FP_TARGET_PROCESS_PFID_14          = 14,
+    FP_TARGET_PROCESS_GAME             = 15,
+    FP_TARGET_PROCESS_GAME_AND_MENU    = 16,
 } FunctionPatcherTargetProcess;
 
-#define FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION            0x00000001
+#define FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION 0x00000001
 
 typedef struct function_replacement_data_t {
-    uint32_t                            VERSION;
-    uint32_t                            physicalAddr;                                       /* [needs to be filled]  */
-    uint32_t                            virtualAddr;                                        /* [needs to be filled]  */
-    uint32_t                            replaceAddr;                                        /* [needs to be filled] Address of our replacement function */
-    uint32_t                            replaceCall;                                        /* [needs to be filled] Address to access the real_function */
-    function_replacement_library_type_t library;                                            /* [needs to be filled] rpl where the function we want to replace is. */
-    char                                function_name[MAXIMUM_FUNCTION_NAME_LENGTH];        /* [needs to be filled] name of the function we want to replace */
-    uint32_t                            realAddr;                                           /* [will be filled] Address of the real function we want to replace. */
-    volatile uint32_t                   replace_data [FUNCTION_PATCHER_METHOD_STORE_SIZE];  /* [will be filled] Space for us to store some jump instructions */
-    uint32_t                            restoreInstruction;                                 /* [will be filled] Copy of the instruction we replaced to jump to our code. */
-    FunctionPatcherFunctionType         functionType;                                       /* [will be filled] */
-    uint8_t                             alreadyPatched;                                     /* [will be filled] */
-    FunctionPatcherTargetProcess        targetProcess;                                      /* [will be filled] */
+    uint32_t VERSION;
+    uint32_t physicalAddr;                                              /* [needs to be filled]  */
+    uint32_t virtualAddr;                                               /* [needs to be filled]  */
+    uint32_t replaceAddr;                                               /* [needs to be filled] Address of our replacement function */
+    uint32_t replaceCall;                                               /* [needs to be filled] Address to access the real_function */
+    function_replacement_library_type_t library;                        /* [needs to be filled] rpl where the function we want to replace is. */
+    char function_name[MAXIMUM_FUNCTION_NAME_LENGTH];                   /* [needs to be filled] name of the function we want to replace */
+    uint32_t realAddr;                                                  /* [will be filled] Address of the real function we want to replace. */
+    volatile uint32_t replace_data[FUNCTION_PATCHER_METHOD_STORE_SIZE]; /* [will be filled] Space for us to store some jump instructions */
+    uint32_t restoreInstruction;                                        /* [will be filled] Copy of the instruction we replaced to jump to our code. */
+    FunctionPatcherFunctionType functionType;                           /* [will be filled] */
+    uint8_t alreadyPatched;                                             /* [will be filled] */
+    FunctionPatcherTargetProcess targetProcess;                         /* [will be filled] */
 } function_replacement_data_t;
 
 
 #define REPLACE_FUNCTION(x, lib, function_name) \
-        REPLACE_FUNCTION_FOR_PROCESS(x, lib, function_name, FP_TARGET_PROCESS_GAME_AND_MENU)
+    REPLACE_FUNCTION_FOR_PROCESS(x, lib, function_name, FP_TARGET_PROCESS_GAME_AND_MENU)
 
 #define REPLACE_FUNCTION_FOR_PROCESS(x, lib, function_name, process) \
-        REPLACE_FUNCTION_EX(x, lib, # function_name, 0, 0, process)
+    REPLACE_FUNCTION_EX(x, lib, #function_name, 0, 0, process)
 
 #define REPLACE_FUNCTION_VIA_ADDRESS(x, physicalAddress, effectiveAddress) \
-        REPLACE_FUNCTION_VIA_ADDRESS_FOR_PROCESS(x, physicalAddress, effectiveAddress, FP_TARGET_PROCESS_ALL)
+    REPLACE_FUNCTION_VIA_ADDRESS_FOR_PROCESS(x, physicalAddress, effectiveAddress, FP_TARGET_PROCESS_ALL)
 
 #define REPLACE_FUNCTION_VIA_ADDRESS_FOR_PROCESS(x, physicalAddress, effectiveAddress, process) \
-        REPLACE_FUNCTION_EX(x, LIBRARY_OTHER, # x, physicalAddress, effectiveAddress, process)
+    REPLACE_FUNCTION_EX(x, LIBRARY_OTHER, #x, physicalAddress, effectiveAddress, process)
 
 #define REPLACE_FUNCTION_EX(x, lib, function_name, physicalAddress, effectiveAddress, process) \
-    { \
-        FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION, \
-        physicalAddress, \
-        effectiveAddress, \
-        (uint32_t) my_ ## x, \
-        (uint32_t) &real_ ## x, \
-        lib, \
-        function_name, \
-        0, \
-        {}, \
-        0, \
-        FUNCTION_PATCHER_STATIC_FUNCTION, \
-        0, \
-        process \
+    {                                                                                          \
+        FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION,                                              \
+                physicalAddress,                                                               \
+                effectiveAddress,                                                              \
+                (uint32_t) my_##x,                                                             \
+                (uint32_t) &real_##x,                                                          \
+                lib,                                                                           \
+                function_name,                                                                 \
+                0,                                                                             \
+                {},                                                                            \
+                0,                                                                             \
+                FUNCTION_PATCHER_STATIC_FUNCTION,                                              \
+                0,                                                                             \
+                process                                                                        \
     }
 
-#define DECL_FUNCTION(res, name, ...) \
-        res (* real_ ## name)(__VA_ARGS__) __attribute__((section(".data"))); \
-        res my_ ## name(__VA_ARGS__)
+#define DECL_FUNCTION(res, name, ...)                                  \
+    res (*real_##name)(__VA_ARGS__) __attribute__((section(".data"))); \
+    res my_##name(__VA_ARGS__)
