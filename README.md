@@ -1,8 +1,8 @@
 [![Publish Docker Image](https://github.com/wiiu-env/libfunctionpatcher/actions/workflows/push_image.yml/badge.svg)](https://github.com/wiiu-env/libfunctionpatcher/actions/workflows/push_image.yml)
 
 # libfunctionpatcher
-Requires the [FunctionPatcherModule](https://github.com/wiiu-env/FunctionPatcherModule) to be running via [WUMSLoader](https://github.com/wiiu-env/WUMSLoader).
-Requires [wut](https://github.com/decaf-emu/wut) for building.
+Requires the [FunctionPatcherModule](https://github.com/wiiu-env/FunctionPatcherModule) to be running via [WUMSLoader](https://github.com/wiiu-env/WUMSLoader).  
+Requires [wut](https://github.com/devkitPro/wut) for building.
 Install via `make install`.
 
 ## Usage
