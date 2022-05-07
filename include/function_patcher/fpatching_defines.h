@@ -100,22 +100,18 @@ typedef enum FunctionPatcherTargetProcess {
     FP_TARGET_PROCESS_GAME_AND_MENU    = 16,
 } FunctionPatcherTargetProcess;
 
-#define FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION 0x00000001
+typedef uint32_t PatchedFunctionHandle;
+#define FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION 0x00000002
 
 typedef struct function_replacement_data_t {
     uint32_t VERSION;
-    uint32_t physicalAddr;                                              /* [needs to be filled]  */
-    uint32_t virtualAddr;                                               /* [needs to be filled]  */
-    uint32_t replaceAddr;                                               /* [needs to be filled] Address of our replacement function */
-    uint32_t replaceCall;                                               /* [needs to be filled] Address to access the real_function */
-    function_replacement_library_type_t library;                        /* [needs to be filled] rpl where the function we want to replace is. */
-    char function_name[MAXIMUM_FUNCTION_NAME_LENGTH];                   /* [needs to be filled] name of the function we want to replace */
-    uint32_t realAddr;                                                  /* [will be filled] Address of the real function we want to replace. */
-    volatile uint32_t replace_data[FUNCTION_PATCHER_METHOD_STORE_SIZE]; /* [will be filled] Space for us to store some jump instructions */
-    uint32_t restoreInstruction;                                        /* [will be filled] Copy of the instruction we replaced to jump to our code. */
-    FunctionPatcherFunctionType functionType;                           /* [will be filled] */
-    uint8_t alreadyPatched;                                             /* [will be filled] */
-    FunctionPatcherTargetProcess targetProcess;                         /* [will be filled] */
+    uint32_t physicalAddr;                       /* [needs to be filled]  */
+    uint32_t virtualAddr;                        /* [needs to be filled]  */
+    uint32_t replaceAddr;                        /* [needs to be filled] Address of our replacement function */
+    uint32_t *replaceCall;                       /* [needs to be filled] Address to access the real_function */
+    function_replacement_library_type_t library; /* [needs to be filled] rpl where the function we want to replace is. */
+    const char *function_name;                   /* [needs to be filled] name of the function we want to replace */
+    FunctionPatcherTargetProcess targetProcess;  /* [will be filled] */
 } function_replacement_data_t;
 
 
@@ -137,14 +133,9 @@ typedef struct function_replacement_data_t {
                 physicalAddress,                                                               \
                 effectiveAddress,                                                              \
                 (uint32_t) my_##x,                                                             \
-                (uint32_t) &real_##x,                                                          \
+                (uint32_t *) &real_##x,                                                        \
                 lib,                                                                           \
                 function_name,                                                                 \
-                0,                                                                             \
-                {},                                                                            \
-                0,                                                                             \
-                FUNCTION_PATCHER_STATIC_FUNCTION,                                              \
-                0,                                                                             \
                 process                                                                        \
     }
 
