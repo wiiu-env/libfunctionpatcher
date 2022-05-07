@@ -7,11 +7,9 @@
 extern "C" {
 #endif
 
-extern void FunctionPatcherRestoreDynamicFunctions(function_replacement_data_t *replacements, uint32_t size);
+extern bool FunctionPatcherPatchFunction(function_replacement_data_t *function_data, PatchedFunctionHandle *outHandle);
 
-extern void FunctionPatcherPatchFunction(function_replacement_data_t *replacements, uint32_t size);
-
-extern void FunctionPatcherRestoreFunctions(function_replacement_data_t *replacements, uint32_t size);
+extern bool FunctionPatcherRestoreFunction(PatchedFunctionHandle outHandle);
 
 #ifdef __cplusplus
 }
