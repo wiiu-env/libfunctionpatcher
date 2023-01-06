@@ -1,6 +1,24 @@
 #pragma once
 
 #include <stdint.h>
+#include <wut.h>
+
+typedef enum FunctionPatcherStatus {
+    FUNCTION_PATCHER_RESULT_SUCCESS                    = 0,
+    FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND           = -0x1,
+    FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT      = -0x2,
+    FUNCTION_PATCHER_RESULT_UNSUPPORTED_VERSION        = -0x3,
+    FUNCTION_PATCHER_RESULT_INVALID_ARGUMENT           = -0x10,
+    FUNCTION_PATCHER_RESULT_PATCH_NOT_FOUND            = -0x11,
+    FUNCTION_PATCHER_RESULT_UNSUPPORTED_STRUCT_VERSION = -0x12,
+    FUNCTION_PATCHER_RESULT_LIB_UNINITIALIZED          = -0x20,
+    FUNCTION_PATCHER_RESULT_UNSUPPORTED_COMMAND        = -0x21,
+    FUNCTION_PATCHER_RESULT_UNKNOWN_ERROR              = -0x1000,
+} FunctionPatcherStatus;
+
+typedef uint32_t FunctionPatcherAPIVersion;
+
+#define FUNCTION_PATCHER_MODULE_API_VERSION_ERROR 0xFFFFFFFF
 
 typedef enum function_replacement_library_type_t {
     LIBRARY_AVM,

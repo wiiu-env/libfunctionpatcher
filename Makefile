@@ -70,7 +70,6 @@ export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-DEFFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.def)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 #---------------------------------------------------------------------------------
@@ -88,7 +87,7 @@ endif
 #---------------------------------------------------------------------------------
 
 export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES))
-export OFILES_SRC	:=	$(DEFFILES:.def=.o) $(SFILES:.s=.o) $(CFILES:.c=.o) $(CPPFILES:.cpp=.o)
+export OFILES_SRC	:=	$(SFILES:.s=.o) $(CFILES:.c=.o) $(CPPFILES:.cpp=.o)
 export OFILES 	:=	$(OFILES_BIN) $(OFILES_SRC)
 export HFILES	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
 
@@ -99,10 +98,10 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 .PHONY: all dist-bin dist-src dist install clean
 
 #---------------------------------------------------------------------------------
-all: lib/libfunctionpatcher.a share/libfunctionpatcher.ld
+all: lib/libfunctionpatcher.a
 
 dist-bin: all
-	@tar --exclude=*~ -cjf libfunctionpatcher-$(VERSION).tar.bz2 include lib share
+	@tar --exclude=*~ -cjf libfunctionpatcher-$(VERSION).tar.bz2 include lib
 
 dist-src:
 	@tar --exclude=*~ -cjf libfunctionpatcher-src-$(VERSION).tar.bz2 include source Makefile
@@ -114,18 +113,14 @@ install: dist-bin
 	bzip2 -cd libfunctionpatcher-$(VERSION).tar.bz2 | tar -xf - -C $(DESTDIR)$(DEVKITPRO)/wums
 
 lib:
-	@[ -d $@ ] || mkdir -p $@
-    
-share:
-	@[ -d $@ ] || mkdir -p $@
+	@$(shell [ ! -d $(BUILD) ] && mkdir -p $(BUILD))
 
 release:
-	@[ -d $@ ] || mkdir -p $@
-    
-share/libfunctionpatcher.ld :$(SOURCES) $(INCLUDES) | share release
-	mv $(CURDIR)/release/*.ld $(CURDIR)/$@
+	@$(shell [ ! -d $(BUILD) ] && mkdir -p $(BUILD))
 
 lib/libfunctionpatcher.a :$(SOURCES) $(INCLUDES) | lib release
+	@$(shell [ ! -d lib ] && mkdir -p lib)
+	@$(shell [ ! -d release ] && mkdir -p release)
 	@$(MAKE) BUILD=release OUTPUT=$(CURDIR)/$@ \
 	BUILD_CFLAGS="-DNDEBUG=1 -O2 -s" \
 	DEPSDIR=$(CURDIR)/release \
@@ -149,12 +144,6 @@ $(OUTPUT)	:	$(OFILES)
 
 $(OFILES_SRC)	: $(HFILES)
 
-#---------------------------------------------------------------------------------
-%.o: %.def
-	$(SILENTMSG) $(notdir $<)
-	$(SILENTCMD)rplimportgen $< $*.s $*.ld $(ERROR_FILTER)
-	$(SILENTCMD)$(CC) -x assembler-with-cpp $(ASFLAGS) -c $*.s -o $@ $(ERROR_FILTER)
-    
 #---------------------------------------------------------------------------------
 %_bin.h %.bin.o	:	%.bin
 #---------------------------------------------------------------------------------
