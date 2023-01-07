@@ -94,8 +94,9 @@ typedef enum function_replacement_library_type_t {
 #define FUNCTION_PATCHER_METHOD_STORE_SIZE 40
 
 typedef enum FunctionPatcherFunctionType {
-    FUNCTION_PATCHER_STATIC_FUNCTION  = 0,
-    FUNCTION_PATCHER_DYNAMIC_FUNCTION = 1
+    FUNCTION_PATCHER_REPLACE_BY_LIB_OR_ADDRESS         = 0,
+    FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_ADDRESS = 1,
+    FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_NAME    = 2,
 } FunctionPatcherFunctionType;
 
 typedef enum FunctionPatcherTargetProcess {
@@ -119,9 +120,9 @@ typedef enum FunctionPatcherTargetProcess {
 } FunctionPatcherTargetProcess;
 
 typedef uint32_t PatchedFunctionHandle;
-#define FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION 0x00000002
+#define FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION 0x00000003
 
-typedef struct function_replacement_data_t {
+typedef struct function_replacement_data_v2_t {
     uint32_t VERSION;
     uint32_t physicalAddr;                       /* [needs to be filled]  */
     uint32_t virtualAddr;                        /* [needs to be filled]  */
@@ -130,8 +131,110 @@ typedef struct function_replacement_data_t {
     function_replacement_library_type_t library; /* [needs to be filled] rpl where the function we want to replace is. */
     const char *function_name;                   /* [needs to be filled] name of the function we want to replace */
     FunctionPatcherTargetProcess targetProcess;  /* [will be filled] */
+} function_replacement_data_v2_t;
+
+typedef struct function_replacement_data_t {
+    uint32_t version;
+    FunctionPatcherFunctionType type;
+    uint32_t physicalAddr; /* [needs to be filled]  */
+    uint32_t virtualAddr;  /* [needs to be filled]  */
+    uint32_t replaceAddr;  /* [needs to be filled] Address of our replacement function */
+    uint32_t *replaceCall; /* [needs to be filled] Address to access the real_function */
+    FunctionPatcherTargetProcess targetProcess;
+    union {
+        struct {
+            const char *function_name;                   /* [needs to be filled] name of the function we want to replace */
+            function_replacement_library_type_t library; /* [needs to be filled] rpl where the function we want to replace is. */
+        } ReplaceInRPL;
+        struct {
+            const uint64_t *targetTitleIds;
+            uint32_t targetTitleIdsCount;
+            uint16_t versionMin;
+            uint16_t versionMax;
+            const char *executableName;
+            uint32_t textOffset;
+            const char *functionName;
+        } ReplaceInRPX;
+    };
 } function_replacement_data_t;
 
+typedef function_replacement_data_t function_replacement_data_v3_t;
+
+#define REPLACE_FUNCTION_OF_EXECUTABLE_BY_FUNCTION_NAME(__replacementFunctionName,               \
+                                                        __targetTitleIds, __targetTitleIdsCount, \
+                                                        __executableName,                        \
+                                                        __functionName)                          \
+    REPLACE_FUNCTION_OF_EXECUTABLE_BY_FUNCTION_NAME_WITH_VERSION(__replacementFunctionName,      \
+                                                                 __targetTitleIds,               \
+                                                                 __targetTitleIdsCount,          \
+                                                                 __executableName,               \
+                                                                 __functionName,                 \
+                                                                 0, 0xFFFF)
+
+#define REPLACE_FUNCTION_OF_EXECUTABLE_BY_FUNCTION_NAME_WITH_VERSION(__replacementFunctionName,               \
+                                                                     __targetTitleIds, __targetTitleIdsCount, \
+                                                                     __executableName,                        \
+                                                                     __functionName,                          \
+                                                                     __versionMin, __versionMax)              \
+    REPLACE_FUNCTION_OF_EXECUTABLE_WITH_VERSION_EX(__replacementFunctionName,                                 \
+                                                   FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_NAME,           \
+                                                   __targetTitleIds,                                          \
+                                                   __targetTitleIdsCount,                                     \
+                                                   __executableName,                                          \
+                                                   0,                                                         \
+                                                   __functionName,                                            \
+                                                   __versionMin, __versionMax)
+
+#define REPLACE_FUNCTION_OF_EXECUTABLE_BY_ADDRESS(__replacementFunctionName,               \
+                                                  __targetTitleIds, __targetTitleIdsCount, \
+                                                  __executableName,                        \
+                                                  __textOffset)                            \
+    REPLACE_FUNCTION_OF_EXECUTABLE_BY_ADDRESS_WITH_VERSION(__replacementFunctionName,      \
+                                                           __targetTitleIds,               \
+                                                           __targetTitleIdsCount,          \
+                                                           __executableName,               \
+                                                           __textOffset,                   \
+                                                           0, 0xFFFF)
+
+#define REPLACE_FUNCTION_OF_EXECUTABLE_BY_ADDRESS_WITH_VERSION(__replacementFunctionName,               \
+                                                               __targetTitleIds, __targetTitleIdsCount, \
+                                                               __executableName,                        \
+                                                               __textOffset,                            \
+                                                               __versionMin, __versionMax)              \
+    REPLACE_FUNCTION_OF_EXECUTABLE_WITH_VERSION_EX(__replacementFunctionName,                           \
+                                                   FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_ADDRESS,  \
+                                                   __targetTitleIds,                                    \
+                                                   __targetTitleIdsCount,                               \
+                                                   __executableName,                                    \
+                                                   __textOffset,                                        \
+                                                   0,                                                   \
+                                                   __versionMin, __versionMax)
+
+#define REPLACE_FUNCTION_OF_EXECUTABLE_WITH_VERSION_EX(__replacementFunctionName,               \
+                                                       __type,                                  \
+                                                       __targetTitleIds, __targetTitleIdsCount, \
+                                                       __executableName,                        \
+                                                       __textOffset,                            \
+                                                       __functionName,                          \
+                                                       __versionMin, __versionMax)              \
+    {                                                                                           \
+        .version       = FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION,                              \
+        .type          = __type,                                                                \
+        .physicalAddr  = 0,                                                                     \
+        .virtualAddr   = 0,                                                                     \
+        .replaceAddr   = (uint32_t) my_##__replacementFunctionName,                             \
+        .replaceCall   = (uint32_t *) &real_##__replacementFunctionName,                        \
+        .targetProcess = FP_TARGET_PROCESS_GAME_AND_MENU,                                       \
+        .ReplaceInRPX  = {                                                                      \
+             .targetTitleIds      = __targetTitleIds,                                           \
+             .targetTitleIdsCount = __targetTitleIdsCount,                                      \
+             .versionMin          = __versionMin,                                               \
+             .versionMax          = __versionMax,                                               \
+             .executableName      = __executableName,                                           \
+             .textOffset          = __textOffset,                                               \
+             .functionName        = __functionName,                                             \
+        }                                                                                       \
+    }
 
 #define REPLACE_FUNCTION(x, lib, function_name) \
     REPLACE_FUNCTION_FOR_PROCESS(x, lib, function_name, FP_TARGET_PROCESS_GAME_AND_MENU)
@@ -145,16 +248,20 @@ typedef struct function_replacement_data_t {
 #define REPLACE_FUNCTION_VIA_ADDRESS_FOR_PROCESS(x, physicalAddress, effectiveAddress, process) \
     REPLACE_FUNCTION_EX(x, LIBRARY_OTHER, #x, physicalAddress, effectiveAddress, process)
 
-#define REPLACE_FUNCTION_EX(x, lib, function_name, physicalAddress, effectiveAddress, process) \
-    {                                                                                          \
-        FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION,                                              \
-                physicalAddress,                                                               \
-                effectiveAddress,                                                              \
-                (uint32_t) my_##x,                                                             \
-                (uint32_t *) &real_##x,                                                        \
-                lib,                                                                           \
-                function_name,                                                                 \
-                process                                                                        \
+#define REPLACE_FUNCTION_EX(__replacementFunctionName, __lib, __function_name, \
+                            __physicalAddress, __effectiveAddress, __process)  \
+    {                                                                          \
+        .version       = FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION,             \
+        .type          = FUNCTION_PATCHER_REPLACE_BY_LIB_OR_ADDRESS,           \
+        .physicalAddr  = __physicalAddress,                                    \
+        .virtualAddr   = __effectiveAddress,                                   \
+        .replaceAddr   = (uint32_t) my_##__replacementFunctionName,            \
+        .replaceCall   = (uint32_t *) &real_##__replacementFunctionName,       \
+        .targetProcess = __process,                                            \
+        .ReplaceInRPL  = {                                                     \
+             .function_name = __function_name,                                 \
+             .library       = __lib,                                           \
+        }                                                                      \
     }
 
 #define DECL_FUNCTION(res, name, ...)                                  \
