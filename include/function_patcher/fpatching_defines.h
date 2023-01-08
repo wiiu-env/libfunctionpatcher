@@ -224,7 +224,7 @@ typedef function_replacement_data_t function_replacement_data_v3_t;
         .virtualAddr   = 0,                                                                     \
         .replaceAddr   = (uint32_t) my_##__replacementFunctionName,                             \
         .replaceCall   = (uint32_t *) &real_##__replacementFunctionName,                        \
-        .targetProcess = FP_TARGET_PROCESS_GAME_AND_MENU,                                       \
+        .targetProcess = FP_TARGET_PROCESS_ALL,                                                 \
         .ReplaceInRPX  = {                                                                      \
              .targetTitleIds      = __targetTitleIds,                                           \
              .targetTitleIdsCount = __targetTitleIdsCount,                                      \
