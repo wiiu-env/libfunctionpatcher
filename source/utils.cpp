@@ -49,7 +49,7 @@ FunctionPatcherStatus FunctionPatcher_InitLibrary() {
         return FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND;
     }
 
-    if (OSDynLoad_FindExport(sModuleHandle, FALSE, "FPGetVersion", (void **) &sFPGetVersion) != OS_DYNLOAD_OK) {
+    if (OSDynLoad_FindExport(sModuleHandle, OS_DYNLOAD_EXPORT_FUNC, "FPGetVersion", (void **) &sFPGetVersion) != OS_DYNLOAD_OK) {
         DEBUG_FUNCTION_LINE_ERR("FindExport FPGetVersion failed.");
         return FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT;
     }
@@ -60,15 +60,15 @@ FunctionPatcherStatus FunctionPatcher_InitLibrary() {
         return FUNCTION_PATCHER_RESULT_UNSUPPORTED_VERSION;
     }
 
-    if (OSDynLoad_FindExport(sModuleHandle, FALSE, "FPAddFunctionPatch", (void **) &sFPAddFunctionPatch) != OS_DYNLOAD_OK) {
+    if (OSDynLoad_FindExport(sModuleHandle, OS_DYNLOAD_EXPORT_FUNC, "FPAddFunctionPatch", (void **) &sFPAddFunctionPatch) != OS_DYNLOAD_OK) {
         DEBUG_FUNCTION_LINE_ERR("FindExport FPAddFunctionPatch failed.");
         sFPAddFunctionPatch = nullptr;
     }
-    if (OSDynLoad_FindExport(sModuleHandle, FALSE, "FPRemoveFunctionPatch", (void **) &sFPRemoveFunctionPatch) != OS_DYNLOAD_OK) {
+    if (OSDynLoad_FindExport(sModuleHandle, OS_DYNLOAD_EXPORT_FUNC, "FPRemoveFunctionPatch", (void **) &sFPRemoveFunctionPatch) != OS_DYNLOAD_OK) {
         DEBUG_FUNCTION_LINE_ERR("FindExport FPRemoveFunctionPatch failed.");
         sFPRemoveFunctionPatch = nullptr;
     }
-    if (OSDynLoad_FindExport(sModuleHandle, FALSE, "FPIsFunctionPatched", (void **) &sFPIsFunctionPatched) != OS_DYNLOAD_OK) {
+    if (OSDynLoad_FindExport(sModuleHandle, OS_DYNLOAD_EXPORT_FUNC, "FPIsFunctionPatched", (void **) &sFPIsFunctionPatched) != OS_DYNLOAD_OK) {
         DEBUG_FUNCTION_LINE_ERR("FindExport FPIsFunctionPatched failed.");
         sFPIsFunctionPatched = nullptr;
     }
@@ -94,7 +94,7 @@ bool FunctionPatcherPatchFunction(function_replacement_data_t *function_data, Pa
             return false;
         }
 
-        if (OSDynLoad_FindExport(sModuleHandle, FALSE, "FunctionPatcherPatchFunction", (void **) &sFunctionPatcherPatchFunction) != OS_DYNLOAD_OK) {
+        if (OSDynLoad_FindExport(sModuleHandle, OS_DYNLOAD_EXPORT_FUNC, "FunctionPatcherPatchFunction", (void **) &sFunctionPatcherPatchFunction) != OS_DYNLOAD_OK) {
             DEBUG_FUNCTION_LINE_WARN("FindExport FunctionPatcherPatchFunction failed.");
             return false;
         }
@@ -110,7 +110,7 @@ bool FunctionPatcherRestoreFunction(PatchedFunctionHandle handle) {
             return false;
         }
 
-        if (OSDynLoad_FindExport(sModuleHandle, FALSE, "FunctionPatcherRestoreFunction", (void **) &sFunctionPatcherRestoreFunction) != OS_DYNLOAD_OK) {
+        if (OSDynLoad_FindExport(sModuleHandle, OS_DYNLOAD_EXPORT_FUNC, "FunctionPatcherRestoreFunction", (void **) &sFunctionPatcherRestoreFunction) != OS_DYNLOAD_OK) {
             DEBUG_FUNCTION_LINE_WARN("FindExport FunctionPatcherRestoreFunction failed.");
             return false;
         }
@@ -125,7 +125,7 @@ FunctionPatcherStatus FunctionPatcher_GetVersion(FunctionPatcherAPIVersion *outV
             return FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND;
         }
 
-        if (OSDynLoad_FindExport(sModuleHandle, FALSE, "FPGetVersion", (void **) &sFPGetVersion) != OS_DYNLOAD_OK) {
+        if (OSDynLoad_FindExport(sModuleHandle, OS_DYNLOAD_EXPORT_FUNC, "FPGetVersion", (void **) &sFPGetVersion) != OS_DYNLOAD_OK) {
             DEBUG_FUNCTION_LINE_WARN("FindExport FPGetVersion failed.");
             return FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT;
         }
